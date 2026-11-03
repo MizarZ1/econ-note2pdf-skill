@@ -1,0 +1,35 @@
+# OS / editor
+.DS_Store
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Local material, generated deliverables, and temporary work
+/.local/
+/inputs/
+/work/
+/output/
+/tmp/
+/data/private/
+/dist/
+
+# Credentials
+.env
+.env.*
+!.env.example
+
+# LaTeX intermediate files; source and intentional PDF fixtures remain trackable
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot

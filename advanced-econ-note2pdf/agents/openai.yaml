@@ -1,0 +1,4 @@
+interface:
+  display_name: "经济学板书转讲义"
+  short_description: "将经济学板书与手写笔记整理为公式图表完整、适合直接复习的 LaTeX PDF"
+  default_prompt: "使用 $advanced-econ-note2pdf 将这些经济学板书整理成适合复习的 LaTeX 讲义和 PDF。"
