@@ -19,9 +19,10 @@ def check_tex(text):
     for name in re.findall(r"\\(?:usepackage|RequirePackage)(?:\[[^\]]*\])?\s*\{([^}]+)\}", text):
         if not re.fullmatch(r"[A-Za-z0-9_, -]+", name):
             raise Problem("Course packages must be ordinary installed package names")
-    for path in re.findall(r"\\includegraphics(?:\[[^\]]*\])?\s*\{([^}]+)\}", text):
-        if not re.fullmatch(r"assets/[A-Za-z0-9_-]+(?:\.[A-Za-z0-9]+)?", path):
-            raise Problem("Image must use a literal registered assets/name path")
+    active = re.sub(r"(?m)(?<!\\)%.*$", "", text)
+    image_commands = r"includegraphics|includepdf|includepdfmerge|pgfimage|pgfdeclareimage|pgfuseimage|epsfig|psfig|XeTeXpicfile|XeTeXpdffile|pdfximage|pdfrefximage"
+    if re.search(r"\\" + "(?:" + image_commands + r")(?![A-Za-z@])", active):
+        raise Problem("Image commands are not allowed in course fragments. Transcribe or redraw in LaTeX, or register a crop as issue.evidence_asset for the appendix.")
 
 
 def validate(root):
@@ -109,12 +110,14 @@ def validate(root):
             except Problem as exc:
                 fail(str(exc))
     seen_assets = set()
+    assets_by_path = {}
     for asset in p["assets"]:
         try:
             path = inside(root, asset.get("path"))
             if asset.get("path") in seen_assets:
                 fail("Duplicate asset path: " + asset["path"])
             seen_assets.add(asset.get("path"))
+            assets_by_path[asset["path"]] = asset
             if not path.is_file() or sha_file(path) != asset.get("sha256"):
                 fail("Asset missing or modified: " + str(asset.get("path")))
             src = sources.get(asset.get("source_id"))
@@ -198,6 +201,20 @@ def validate(root):
                 if not links:
                     fail("Open critical issue needs an affected block", uid)
                 fail("Critical issue: " + str(issue.get("summary")), uid, gap=True)
+            if "evidence_asset" in issue:
+                name = issue["evidence_asset"]
+                asset = assets_by_path.get(name) if isinstance(name, str) else None
+                if not asset or not re.fullmatch(r"assets/[A-Za-z0-9_-]+\.png", name):
+                    fail("Appendix evidence needs a registered crop path", uid)
+                else:
+                    linked_sources = {ref.get("source_id") for block in blocks
+                                      if block.get("id") in links and isinstance(block.get("refs"), list)
+                                      for ref in block["refs"]
+                                      if isinstance(ref, dict) and isinstance(ref.get("source_id"), str)}
+                    if asset.get("source_id") not in linked_sources or asset.get("box") == [0, 0, 1, 1]:
+                        fail("Appendix evidence must be a local crop from a linked block's source", uid)
+                if not links or issue.get("appendix") is False or issue.get("status") != "open":
+                    fail("Appendix evidence needs an open, visible issue linked to a block", uid)
             corrected.update(links)
         for b in blocks:
             bid = str(b.get("id"))
