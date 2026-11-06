@@ -72,7 +72,7 @@ def main():
                                 "body": {"study": "content/explanation.tex"}})
         write(unit_path, unit)
         (root / "content/b002.tex").write_text(r"""\begin{figure}[htbp]\centering
-\includegraphics[width=.3\linewidth]{assets/diagram.png}\par FIGUREBODYMARKER\par
+\begin{tikzpicture}\node {FIGUREBODYMARKER};\end{tikzpicture}
 \caption{FIGUREMARKER}\end{figure}
 """, encoding="utf-8")
         (root / "content/b003.tex").write_text(r"""\begin{table}[htbp]\centering

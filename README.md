@@ -6,6 +6,7 @@
 
 - **沿着知识线索阅读**：围绕问题、条件、推导和结论组织内容，把跨照片的推导衔接起来。
 - **保留经济学细节**：关注公式上下标、时点、约束、边界条件，以及相图、回归表和图表注释。
+- **用 LaTeX 整理板书**：转录可辨认的文字、公式和表格，重绘能可靠还原的图。其余必要的局部截图随原因放在附录。
 - **区分原文与讲解**：原文和原式可用浅彩色框或深蓝强调，补充解释在相邻正文中展开。
 - **方便继续修改**：交付可编辑源码、必要图表素材及来源记录，便于核对、补充和重新生成 PDF。
 
@@ -16,7 +17,7 @@
 直接在 Codex 对话中输入：
 
 ```text
-$skill-installer install https://github.com/MizarZ1/econ-note2pdf-skill/tree/v0.1.0-preview/advanced-econ-note2pdf
+$skill-installer install https://github.com/MizarZ1/econ-note2pdf-skill/tree/v0.1.1-preview/advanced-econ-note2pdf
 ```
 
 也可以使用 Node.js/npm，在终端执行：

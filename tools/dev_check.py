@@ -139,9 +139,6 @@ def check_latex(root):
 \node at (axis cs:2.7,2.7) {$p_1x_1+p_2x_2=m$};
 \end{axis}\end{tikzpicture}
 \caption{合成预算线示意}\end{figure}
-\begin{figure}[htbp]\centering
-\includegraphics[width=.42\linewidth]{assets/diagram.png}
-\caption{合成来源区域，检查裁切与比例}\end{figure}
 """, encoding="utf-8")
     (root / "content/b003.tex").write_text(r"""\subsection{回归表与矩阵}
 本表为排版示例，不含实际估计结果；括号行演示标准误位置。
@@ -162,10 +159,22 @@ def check_latex(root):
     unit["issues"] = [{"id": "n001", "severity": "note", "status": "open", "block_ids": ["b001"],
                        "summary": "符号说明示例", "detail": "本条用于检查普通事项只出现在附录。"}]
     write(root / "units/u001.json", unit)
+    evidence_unit = json.loads((root / "units/u001.json").read_text())
+    evidence_unit["issues"].append({
+        "id": "crop001", "severity": "note", "status": "open", "block_ids": ["b001"],
+        "summary": "局部图形证据", "detail": "合成图形的关键标签无法确认。",
+        "evidence_asset": "assets/diagram.png",
+    })
+    write(root / "units/u001.json", evidence_unit)
     run("validate", "--project", root)
     run("assemble", "--project", root, "--mode", "study")
     built = run("compile", "--project", root, "--mode", "study")
     assert built["compiled"] and not built["partial"]
+    from pypdf import PdfReader
+    pages = PdfReader(built["pdf"]).pages
+    evidence_pages = [page for page in pages if len(page.images)]
+    assert evidence_pages and all("局部图形证据" in page.extract_text() for page in evidence_pages)
+
     run("render", "--project", root, "--mode", "study")
     run("package", "--project", root, "--mode", "study", expected=2)
     packed = run("package", "--project", root, "--mode", "study", "--allow-unreviewed", expected=3)

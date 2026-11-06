@@ -33,6 +33,13 @@ def main():
         (dest / '.latexmkrc').write_text('open(my $f, ">", "%s"); print $f "unexpected"; close($f);\n' % marker)
         run('compile', '--project', root, '--mode', 'faithful')
         assert not marker.exists()
+        fragment = root / 'content/b001.tex'
+        clean_body = fragment.read_text()
+        for command in (r'\includegraphics{assets/diagram.png}', r'\pgfimage{assets/diagram.png}'):
+            fragment.write_text(clean_body + '\n' + command)
+            result = run('assemble', '--project', root, '--mode', 'faithful', expected=2)
+            assert 'issue.evidence_asset' in result['error']
+        fragment.write_text(clean_body)
         outside = base / 'canary.tex'
         outside.write_text('OUTSIDE-CANARY')
         original = (root / 'content/b001.tex').read_text()

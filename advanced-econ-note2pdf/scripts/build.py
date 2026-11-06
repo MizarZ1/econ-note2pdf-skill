@@ -79,7 +79,7 @@ def render_unit(root, unit, mode, source_style="plain"):
 
 
 def appendix(all_units, mode):
-    lines = []
+    lines, used = [], set()
     for unit in all_units:
         visible = {b["id"] for b in unit["blocks"] if not (b["origin"] == "explanation" and mode == "faithful")}
         for issue in unit["issues"]:
@@ -91,9 +91,16 @@ def appendix(all_units, mode):
                 continue
             location = "\\hyperref[block:%s]{对应位置}" % links[0] if links else tex_escape(unit["title"])
             lines.append("\\paragraph{%s} %s。%s\n" % (tex_escape(issue["summary"]), location, tex_escape(issue["detail"])))
+            if issue.get("evidence_asset"):
+                path = issue["evidence_asset"]
+                used.add(path)
+                lines.append(
+                    r"\par\smallskip\noindent\includegraphics"
+                    r"[width=.9\linewidth,height=.42\textheight,keepaspectratio]{%s}\par" % path
+                )
     if not lines:
-        return ""
-    return "\\clearpage\n\\appendix\n\\section{整理与复核说明}\n" + "\n".join(lines)
+        return "", used
+    return "\\clearpage\n\\appendix\n\\section{整理与复核说明}\n" + "\n".join(lines), used
 
 
 def symbol_table(p):
@@ -141,7 +148,8 @@ def assemble(args):
             source_map["units"].append({"id": unit["id"], "title": unit["title"], "output_file": file_name,
                 "blocks": [{"id": b["id"], "kind": b["kind"], "origin": b["origin"], "refs": b["refs"]} for b in visible]})
         write(stage / "body.tex", "\n".join(body))
-        write(stage / "appendix.tex", appendix(us, args.mode))
+        appendix_tex, used_assets = appendix(us, args.mode)
+        write(stage / "appendix.tex", appendix_tex)
         write(stage / "symbols.tex", symbol_table(p))
         mode_title = "忠实转录" if args.mode == "faithful" else ("参考资料" if p.get("presentation", {}).get("purpose") == "reference" else "复习讲义")
         style = p.get("presentation", {}).get("source_style", "plain")
@@ -151,18 +159,7 @@ def assemble(args):
         write(stage / "main.tex", DOCUMENT_CLASS + "\n\\input{preamble.tex}\n\\input{course-preamble.tex}\n"
               "\\begin{document}\n\\EconMakeTitle{%s}{%s}\n%s%s\\input{symbols.tex}\n\\input{body.tex}\n\\input{appendix.tex}\n\\end{document}\n"
               % (tex_escape(p["title"]), mode_title, legend, toc))
-        # Only literal references in the selected output are deliverable assets.
-        assembled = "\n".join(f.read_text(encoding="utf-8") for f in stage.rglob("*.tex"))
-        assembled = re.sub(r"(?m)(?<!\\)%.*$", "", assembled)
-        used = set(re.findall(r"\\includegraphics(?:\[[^\]]*\])?\s*\{(assets/[^{}]+)\}", assembled))
-        known = {a["path"]: a for a in p["assets"]}
-        selected = set()
-        for name in used:
-            candidates = [name] if name in known else [v for v in known if str(Path(v).with_suffix("")) == name]
-            if len(candidates) != 1:
-                raise Problem("Image must reference one registered literal asset: " + name)
-            selected.add(candidates[0])
-        source_map["assets"] = [a for a in p["assets"] if a["path"] in selected]
+        source_map["assets"] = [a for a in p["assets"] if a["path"] in used_assets]
         for asset in source_map["assets"]:
             target = inside(stage, asset["path"])
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -360,7 +357,7 @@ def package(args):
     delivery = {"status": status, "mode": args.mode, "content_reviewed": content_reviewed, "layout_reviewed": layout_reviewed,
                 "failed_units": b["failed_units"], "gap_count": len(b["gaps"]), "typesetting_warning_count": len(b["warnings"]), "pdf_sha256": b["pdf_sha256"]}
     description = ("# 交付说明\n\n状态：%s。\n\n本工程使用 XeLaTeX / latexmk，运行 `latexmk -norc -xelatex -no-shell-escape main.tex` 编译。"
-                   "\n重编译后运行 `python3 pdf_compat.py main.pdf` 内嵌中文 Unicode 映射（需要 pypdf 和 TeX adobemapping）。已交付的 PDF 已完成此处理。\n\n正文在 units/，原图素材在 assets/，来源记录见 source-map.json；完整原始材料未嵌入。"
+                   "\n重编译后运行 `python3 pdf_compat.py main.pdf` 内嵌中文 Unicode 映射（需要 pypdf 和 TeX adobemapping）。已交付的 PDF 已完成此处理。\n\n正文在 units/，附录局部截图在 assets/，来源记录见 source-map.json；完整原始材料未嵌入。"
                    "失败单元如有，源码保留在 uncompiled/。\n\n内容复核：%s；页面复核：%s。详细状态见 delivery.json。\n" %
                    (status, content_reviewed, layout_reviewed))
     out = root / "output"
