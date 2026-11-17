@@ -25,4 +25,5 @@ jobs:
         run: |
           python tools/check_repo.py
           python tools/dev_check.py
+          python tools/installation_check.py
           python tools/package_skill.py

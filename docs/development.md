@@ -11,6 +11,8 @@ python3 tools/pdf_compat_check.py
 python3 tools/presentation_check.py
 python3 tools/check_repo.py
 python3 tools/package_skill.py
+python3 tools/installation_check.py
+python3 tools/installation_check.py --with-latex
 ```
 
 `dev_check.py` 生成矩形与短文本的合成图片/PDF，检查文件导入、页面展开、分块、来源版本、裁切冲突与复核失效。它不调用模型、不含真实用户材料，不用于评价笔迹识别或讲义阅读质量。默认临时目录自动清理；`--keep .local/p3-check` 可保留产物定位问题。
@@ -77,3 +79,23 @@ Skills CLI 本地目录安装已在一次性项目内验证，未覆盖个人 sk
 最终 PDF 在编译后嵌入缺失的受支持标准 Unicode 映射，独立 ZIP 带 `pdf_compat.py` 和使用说明。手工重新编译后执行 `python3 pdf_compat.py main.pdf`。已在无外部 CMaps 的 PDF.js 中复现原 PDF 中文消失，修复后中文可见；Codex 内建编译器已对显式 main.tex 编译成功。此证据不等同于 Codex UI 已目视验收。
 
 授权数理经济学案例扩展为三块完整板面的两页连续讲义：优化对象与约束、Hamilton 定义、一阶变分、协态及边界条件；来源内容与补充推导交错排列，并分别记录。已核对关键公式及条件，查看全部渲染页；当前 PDF 无编译警告。仅覆盖选定板面，不代表全部照片、四学科或跨宿主验收；所有真实材料及交付物保留在忽略目录。
+
+## 独立安装与宿主发现（2026-11-17）
+
+`installation_check.py` 从当前核心生成可复现 ZIP，在临时 `.claude/skills`、`.agents/skills`、`.dsh/skills` 目录解压；核对包内资源、从无关 cwd 与含空格路径运行 CLI、合成输入准备和组装，以及安装文件未被修改。`--with-latex` 另检查中文编译、渲染与未复核导出，正常保持 unreviewed，不自动登记宿主内容／布局复核。两种命令均已通过；默认无 TeX 检查纳入 CI。
+
+Claude Code 2.1.322 与当前官方目录和账户技能同步规则已核对。一次隔离项目发现探测退出码 0：catalog 包含该技能，实际 Skill 调用和两次 Read 分别读取安装副本的 SKILL.md／CLI 源码，工具均成功。仅启用 Skill／Read，未开放 MCP 或修改用户配置；会话沿用用户默认模型 deepseek-v4-pro，不能写成 Claude 模型转录质量通过。原始事件仅在本地忽略目录保存。
+
+Claude 上传包沿用同名根目录的完整 ZIP；网页上传帮助与执行环境单独核对，没有把 API 限制套用到网页。Chrome 实际访问停在登录前 Cloudflare 安全验证，未完成上传或宿主内依赖／编译验证；未验证桌面端。
+
+DeepSeek Harness 0.2.1-rc.5 使用本机已安装的 `FileSystemSkillProvider` 和 `SkillRegistry` 作无模型发现检查：仓库 `.agents` 链接、隔离项目 `.dsh`、隔离用户根及仅 custom 根均成功加载正文，正文摘要一致、参考文件／脚本／模板存在；registry 同名优先级选择 project-dsh，snapshot complete。隔离测试关闭 watch，使用临时 dshHome／agentsHome，不读取凭据或改变用户配置。通过 Electron Node 模式载入实际已安装模块；本机路径、应用源码与原始 JSON 证据仅在忽略目录保留。此检查不代表模型图像理解或端到端讲义运行。
+
+安装与加载规则、官方来源及能力边界统一见 [hosts.md](../advanced-econ-note2pdf/references/hosts.md)。旧版 skill 和两张合成课堂图片已保存在本地；规则精简对照另见下节，不以安装探测数据推断实际 token 降幅。
+
+## 2026-11-17 规则结构精简
+
+配置询问集中在入口，模式／来源与阅读排版集中在 editorial，执行命令／恢复／复核集中在 workflow，content-model 保留字段与状态定义并链接操作说明。完整转换仍须读取必要参考；安装排错和学科指南按条件读取。脚本、模板、字段接口及学科规则未改。
+
+逐条规则归属、独立审查修正、静态字符统计与同材料转换结果见 [规则精简验证记录](validation/2026-11-17-skill-refactor.md)。入口减少 57.0%，入口与三份共用参考减少 15.7%；安装说明补齐后，全部 Markdown 总量增加 0.9%。未取得可比运行 token 数据，不能把这些字符变化当作成本降幅。
+
+规则阶段隔离安装含 LaTeX 检查、仓库检查、skill 校验和 18 种命令参数解析通过。本轮源码已准备同步至公开 main；已发布标签及 Release 保持原版本，获取最新改动与生成完整 ZIP 的方法见 README。
