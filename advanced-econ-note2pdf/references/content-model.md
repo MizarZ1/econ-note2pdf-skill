@@ -19,11 +19,10 @@
 }
 ```
 
-- `purpose`：revision（复习理解）或 reference（查阅参考）。只指导 study 的内容组织；不是新的 mode，不允许改变 faithful 的编辑权限。缺省为 revision。
+- `purpose`：revision（复习理解，默认）或 reference（查阅参考），只指导 study，不改变 mode 权限。
 - `source_style`：plain（统一排版）、accent（原文深蓝强调）或 box（原文浅色块）。缺省为 plain，兼容已有工程。
-- 初始化可使用 `--purpose revision|reference`、`--source-style plain|accent|box`；宿主也可编辑 project.json 中对应字段，不在正文写技术配置。变更后重新 assemble、compile、render 并复核。
-- 原文强调只作用于 `origin: source` 块。explanation 和 correction 保持普通正文样式；样式不是来源证明，仍需 refs 和实际对照核查。
-- box 对普通来源块使用可跨页色块；含 figure、table 浮动环境或 longtable 长表的块改用强调色，以保留其排版行为。不要为了套入色块删除图表内容或缩小到不可读。
+- 初始化参数为 `--purpose revision|reference`、`--source-style plain|accent|box`，也可编辑对应字段。变更后的重建和复核见 [工作流](workflow.md)。技术配置不写入正文。
+- 强调仅作用于 `origin: source`；仍须 refs 与实际核查。样式、来源组织和色块回退行为见 [编辑规则](editorial.md)。
 
 - input：`id`、`name`、`path`（原始副本）、`sha256`。原始副本不覆盖。
 - source：`id`、`input_id`、`page`（从 1 起）、`revision`（未准备时 null）、`image`、`image_sha256`（准备后）、`preview`、`size`、`tiles`、`transform`。未准备时后三类可为空。文件顺序即输入建议顺序；`order_confirmed` 由宿主核对后设 true。
@@ -60,7 +59,7 @@ source ID 如 `s0001`，unit ID 如 `u001`。所有 ID 使用字母开头的 ASC
 - `refs`：每项为 source_id、revision、box。source 必须在该 unit 的 source_ids 内，revision 必须为当前值。
 - `body.faithful`：忠实版片段；`body.study`：复习版片段。复习版未提供 study 时可复用 faithful；忠实版不回退使用 study。explanation 必须提供 study，只进入复习版。correction 必须同时提供两个版本，并有学术事项说明修正。
 - 块 ID 在整份项目唯一。片段是正文，可含 align、tikzpicture、表格和环境，不能含 documentclass、begin/end document。避免跨块未闭合环境；跨图推导可放进同一块或多个完整环境并引用前式。
-- `blocks` 按阅读顺序排列，可交错出现 source 与 explanation。一个块只承担一种来源身份；含原式和补充解释的段落应按身份拆成连续块，避免整段被误标成原文。各块保留完整的 LaTeX 环境。
+- `blocks` 按阅读顺序排列，允许交错 source 与 explanation；每块只含一种 origin，混合内容须拆块。
 - 使用 `\label{eq:...}` / `\ref{eq:...}` 关联推导；编译器生成编号，不能在正文猜最终页码。
 - 正文片段、记号和课程导言区不得直接调用插图命令。可辨认的文字、公式、表格写成 LaTeX，能可靠重绘的图用 TikZ 或 PGFPlots。
 - 确实无法还原时，先用 crop 登记最小必要局部，再在单元的 open 复核事项中加 `"evidence_asset": "assets/detail.png"`。该事项须关联至少一个使用同一来源的内容块，detail 写明具体无法还原的原因，并保留附录可见。组装器生成附录截图和指向正文的链接。整页裁切不能作为证据。只导出当前模式附录实际使用的截图。
@@ -88,7 +87,7 @@ issue 必填 `id`、`severity`（note/critical）、`status`（open/resolved）�
 
 由工具维护：`version:1`、`reviews`（unit ID → digest/note/时间）、`builds`（mode → fingerprint/assembled/compiled/partial/PDF 哈希/渲染/布局复核）、`events`（操作历史）。不要手改状态来跳过检查。
 
-指纹按当前实际输入计算，旧值意味着 stale。来源/片段/素材/模板改变会使相关复核或构建失效。恢复时先 status，修正内容文件，再 validate、assemble、compile、render，实际阅读后 review。
+指纹按当前实际输入计算，旧值意味着 stale。来源/片段/素材/模板改变会使相关复核或构建失效；恢复与实际复核顺序见工作流。
 
 ## 诊断与退出
 
