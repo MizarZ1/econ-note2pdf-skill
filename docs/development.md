@@ -98,4 +98,4 @@ DeepSeek Harness 0.2.1-rc.5 使用本机已安装的 `FileSystemSkillProvider` �
 
 逐条规则归属、独立审查修正、静态字符统计与同材料转换结果见 [规则精简验证记录](validation/2026-11-17-skill-refactor.md)。入口减少 57.0%，入口与三份共用参考减少 15.7%；安装说明补齐后，全部 Markdown 总量增加 0.9%。未取得可比运行 token 数据，不能把这些字符变化当作成本降幅。
 
-规则阶段隔离安装含 LaTeX 检查、仓库检查、skill 校验和 18 种命令参数解析通过。本轮源码已准备同步至公开 main；已发布标签及 Release 保持原版本，获取最新改动与生成完整 ZIP 的方法见 README。
+规则阶段隔离安装含 LaTeX 检查、仓库检查、skill 校验和 18 种命令参数解析通过。本轮源码同步的提交、CI 和合并结果见 [PR #3](https://github.com/MizarZ1/econ-note2pdf-skill/pull/3)；已发布标签及 Release 保持原版本，获取最新改动与生成完整 ZIP 的方法见 README。

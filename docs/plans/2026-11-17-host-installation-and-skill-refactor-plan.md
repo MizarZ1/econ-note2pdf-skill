@@ -1,6 +1,6 @@
 # Claude / DeepSeek Harness 安装适配与规则精简
 
-日期：2026-11-17。安装说明、检查工具与规则调整已完成；公开仓库同步的评审和 CI 状态见本轮 PR。本文件记录产品改动与验证，不向其他 clone／fork 授予推送、合并或发布权限。
+日期：2026-11-17。安装说明、检查工具与规则调整已完成；公开仓库同步的评审、CI 与合并状态见 [PR #3](https://github.com/MizarZ1/econ-note2pdf-skill/pull/3)。本文件记录产品改动与验证，不向其他 clone／fork 授予推送、合并或发布权限。
 
 [开发路线](2026-10-31-v0.1-development-plan.md) · [规格](../spec.md) · [开发验证](../development.md) · [规则对照记录](../validation/2026-11-17-skill-refactor.md)
 
@@ -35,7 +35,7 @@
 
 ## GitHub 同步记录
 
-源快照为开发提交 `0b4e844`，公开库基线 `5eb1813`；任务分支 `feat/host-installation-rule-sync`。核心目录与源快照逐文件一致。公开库保留 AGENTS.md、简明路线与发布说明；README 区分已发布版本和 main 最新源码，并说明如何生成完整安装／上传 ZIP。
+源快照为开发提交 `0b4e844`，公开库基线 `5eb1813`；任务分支 `feat/host-installation-rule-sync`，交付记录为 [PR #3](https://github.com/MizarZ1/econ-note2pdf-skill/pull/3)。核心目录与源快照逐文件一致。公开库保留 AGENTS.md、简明路线与发布说明；README 区分已发布版本和 main 最新源码，并说明如何生成完整安装／上传 ZIP。
 
 在公开库隔离 checkout 运行以下检查，均已通过：仓库检查、完整合成 LaTeX 流程、发布边界检查、中文映射、排版、隔离安装含 LaTeX 检查，以及 skill 元数据校验。两条宿主入口仍为有效相对链接。私人材料、生成讲义、探测日志、本机路径及开发库 Git 历史未纳入。
 
